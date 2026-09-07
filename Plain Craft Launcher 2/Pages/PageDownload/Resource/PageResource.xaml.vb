@@ -246,13 +246,14 @@ Public Class PageResource
         If Not TextSearchVersion.IsDropDownOpen Then UpdateSearchLoaderVisibility()
     End Sub
     Private Sub UpdateSearchLoaderVisibility() Handles TextSearchVersion.DropDownClosed
-        If PageType = ResourceTypes.Mod AndAlso (TextSearchVersion.Text.Contains(".") OrElse TextSearchVersion.Text.Contains("w")) Then
+        If PageType = ResourceTypes.Mod AndAlso TextSearchVersion.Text <> "" AndAlso TextSearchVersion.Text <> "全部 (也可自行输入)" Then
             ComboSearchLoader.Visibility = Visibility.Visible
             Grid.SetColumnSpan(TextSearchVersion, 1)
         Else
             ComboSearchLoader.Visibility = Visibility.Collapsed
             Grid.SetColumnSpan(TextSearchVersion, 2)
-            '输入版本号时可能暂时没有有效版本，保留加载器选择；搜索时忽略隐藏的条件（#9009）
+            '清空输入框是编辑版本号的中间状态，不应清空加载器选择（#9009）
+            If TextSearchVersion.Text <> "" Then ComboSearchLoader.SelectedIndex = 0
         End If
     End Sub
 
