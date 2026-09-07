@@ -744,11 +744,7 @@ Recheck:
                     Case Else '根据 API 进行筛选
                         Dim RealJson As String = If(JsonObject, JsonText).ToString
                         '愚人节与快照版本
-                        Dim FixedReleaseTime = ReleaseTime.ToUniversalTime().AddHours(2)
-                        Dim JsonType = If(JsonObject("type"), "").ToString
-                        If JsonType = "fool" OrElse
-                           (FixedReleaseTime.Month = 4 AndAlso FixedReleaseTime.Day = 1 AndAlso JsonType = "snapshot") OrElse
-                           GetMcFoolName(Version.VanillaName) <> "" Then
+                        If IsFool() Then
                             State = McInstanceState.Fool
                         ElseIf IsSnapshot() Then
                             State = McInstanceState.Snapshot
@@ -850,6 +846,14 @@ ExitDataLoad:
             End Try
             Return Me
         End Function
+        Private Function IsFool() As Boolean
+            Dim FixedReleaseTime = ReleaseTime.ToUniversalTime().AddHours(2)
+            Dim JsonType = If(JsonObject("type"), "").ToString
+            Return JsonType = "fool" OrElse
+                   (FixedReleaseTime.Month = 4 AndAlso FixedReleaseTime.Day = 1 AndAlso JsonType = "snapshot") OrElse
+                   GetMcFoolName(Version.VanillaName) <> ""
+        End Function
+
         Private Function IsSnapshot() As Boolean
             Dim jsonType As String = If(JsonObject("type"), "").ToString
             Return {"w", "snapshot", "rc", "pre", "experimental", "-"}.Any(Function(s) Version.VanillaName.ContainsIgnoreCase(s)) OrElse
@@ -874,7 +878,9 @@ ExitDataLoad:
             Dim Info As String
             Select Case State
                 Case McInstanceState.Snapshot, McInstanceState.Original, McInstanceState.Forge, McInstanceState.NeoForge, McInstanceState.Fabric, McInstanceState.OptiFine, McInstanceState.LiteLoader
-                    If Version.VanillaName.ContainsIgnoreCase("pre") Then
+                    If IsFool() Then
+                        Info = "愚人节版本 " & Version.VanillaName
+                    ElseIf Version.VanillaName.ContainsIgnoreCase("pre") Then
                         Info = "预发布版 " & Version.VanillaName
                     ElseIf Version.VanillaName.ContainsIgnoreCase("rc") Then
                         Info = "发布候选 " & Version.VanillaName
