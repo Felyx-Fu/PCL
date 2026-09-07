@@ -126,7 +126,7 @@ Public Class PageResource
             .SearchText = TextSearchName.Text
             .GameVersion = GameVersion
             .Tag = ComboSearchTag.SelectedItem.Tag
-            .ModLoaders = If(PageType = ResourceTypes.Mod, Val(ComboSearchLoader.SelectedItem.Tag), ModLoaders.None)
+            .ModLoaders = If(PageType = ResourceTypes.Mod AndAlso GameVersion IsNot Nothing, Val(ComboSearchLoader.SelectedItem.Tag), ModLoaders.None)
             .Sources = CType(Val(ComboSearchSource.SelectedItem.Tag), ResourcePlatforms)
         End With
         Return Request
@@ -252,7 +252,7 @@ Public Class PageResource
         Else
             ComboSearchLoader.Visibility = Visibility.Collapsed
             Grid.SetColumnSpan(TextSearchVersion, 2)
-            ComboSearchLoader.SelectedIndex = 0
+            '输入版本号时可能暂时没有有效版本，保留加载器选择；搜索时忽略隐藏的条件（#9009）
         End If
     End Sub
 
